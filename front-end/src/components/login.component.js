@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
+import { Link } from "react-router-dom";
 
 import AuthService from "../services/auth.service";
 
@@ -130,6 +131,10 @@ export default class Login extends Component {
                 <span>Login</span>
               </button>
             </div>
+
+            <Link to={"/forgot"}>
+              Forgot Password
+            </Link>
 
             {this.state.message && (
               <div className="form-group">

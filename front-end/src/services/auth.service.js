@@ -22,32 +22,27 @@ class AuthService {
     localStorage.removeItem("user");
   }
 
-  register(username,
-    email,
-    password,
-    firstname,
-    lastname,
-    address,
-    birthday,
-    //sex,
-    //gender,
-    state,
-    city,
-    zip) {
-    return axios.post(API_URL + "signup", {
-      username,
-      email,
-      password,
-      firstname,
-      lastname,
-      address,
-      birthday,
-      //sex,
-      //gender,
-      state,
-      city,
-      zip
+  forgot(username) {
+    return axios.post(API_URL + "forgot", {
+      username
     });
+  }
+  forgotUserAccessCode(username, userAccessCode) {
+    return axios.post(API_URL + "forgotUserAccessCode", {
+      username,
+      userAccessCode
+    });
+  }
+  resetPassword(username, password, password2) {
+    return axios.post(API_URL + "resetPassword", {
+      username,
+      password,
+      password2
+    });
+  }
+
+  register(data) {
+    return axios.post(API_URL + "signup", data);
   }
 
   getCurrentUser() {

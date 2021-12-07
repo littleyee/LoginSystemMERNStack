@@ -1,23 +1,33 @@
-import axios from 'axios';
+import http from "../http-common";
 import authHeader from './auth-header';
-
-const API_URL = 'http://localhost:8000/api/test/';
-
 class UserService {
   getPublicContent() {
-    return axios.get(API_URL + 'all');
+    return http.get('user/all');
   }
 
   getUserBoard() {
-    return axios.get(API_URL + 'user', { headers: authHeader() });
+    return http.get('user/user', { headers: authHeader() });
   }
 
   getModeratorBoard() {
-    return axios.get(API_URL + 'mod', { headers: authHeader() });
+    return http.get('user/mod', { headers: authHeader() });
   }
 
   getAdminBoard() {
-    return axios.get(API_URL + 'admin', { headers: authHeader() });
+    return http.get('user/admin', { headers: authHeader() });
+  }
+
+
+  profileEdit(data) {
+    return http.put('/profile/edit/', data, { headers: authHeader() })
+      .then(response => {
+        // combine old and new user data
+        var user = JSON.parse(localStorage.getItem("user"));
+        user = {...user, ...response.data};
+        localStorage.setItem("user", JSON.stringify(user));
+
+        return response.data;
+      });
   }
 }
 

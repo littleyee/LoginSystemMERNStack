@@ -1,151 +1,19 @@
 import React, { Component } from "react";
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
+import Select from "react-validation/build/select";
 import CheckButton from "react-validation/build/button";
-import { isEmail,isDate} from "validator";
 
+import { vrequired, vemail, vdate } from "../common/validators";
+import { vfirstName, vlastName, vaddress, vcity, vzip } from "../common/person-validators";
+import { vusername, vpassword } from "../common/user-validators";
 
 import AuthService from "../services/auth.service";
-
-const required = value => {
-  if (!value) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        This field is required!
-      </div>
-    );
-  }
-};
-
-const email = value => {
-  if (!isEmail(value)) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        This is not a valid email.
-      </div>
-    );
-  }
-};
-
-const date = value => {
-  if (!isDate(value)) {
-      return (
-          <div className="alert alert-danger" role="alert">
-              This is not a valid date.
-          </div>
-      );
-  }
-};
-
-
-const vusername = value => {
-  if (value.length < 3 || value.length > 20) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The username must be between 3 and 20 characters.
-      </div>
-    );
-  }
-};
-
-const vpassword = value => {
-  if (value.length < 6 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The password must be between 6 and 40 characters.
-      </div>
-    );
-  }
-};
-
-const vfirstname = value => {
-  if (value.length < 2 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The firstname must be between 2 and 40 characters.
-      </div>
-    );
-  }
-};
-
-const vlastname = value => {
-  if (value.length < 2 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The lastname must be between 2 and 40 characters.
-      </div>
-    );
-  }
-};
-
-// double check 
-const vaddress = value => {
-  const letters = /^[\s0-9a-zA-Z]+$/;
-  if (!letters.test(value)) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        invalid address
-      </div>
-    );
-  }
-};
-
-// const vsex = value => {
-  
-// };
-
-// const vgender = value => {
-  
-// };
-
-
-const vstate = value => {
-  if (value.length < 2 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        invalid state 
-      </div>
-    );
-  }
-  
-};
-
-const vcity = value => {
-  if (value.length < 2 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        invalid city 
-      </div>
-    );
-  }
-  
-};
-
-
-const vzip = value => {
-  const zipletters =  /^([0-9]{5})$/;
-  if (!zipletters.test(value)) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        Invalid address
-      </div>
-    );
-  }
-  
-};
+import UserService from "../services/user.service";
+import PersonService from "../services/person.service";
 
 
 
-// add fields of dob 
-// firstname:req.body.firstname,
-//     lastname:req.body.lastname,
-//     address: req.body.address,
-//     sex:req.body.sex,
-//     gender:req.body.gender,
-//     birthday:req.body.birthday,
-//     state:req.body.state,
-//     city:req.body.city,
-//     zip:req.body.zip
 export default class Register extends Component {
   constructor(props) {
     super(props);
@@ -156,10 +24,11 @@ export default class Register extends Component {
     this.onChangeFirstName = this.onChangeFirstName.bind(this);
     this.onChangeLastName = this.onChangeLastName.bind(this);
     this.onChangeAddress = this.onChangeAddress.bind(this);
-    // this.onChangeSex = this.onChangeSex.bind(this);
-    // this.onChangeGender = this.onChangeGender.bind(this);
+    this.onChangeGenderId = this.onChangeGenderId.bind(this);
+    this.onChangePronounId = this.onChangePronounId.bind(this);
+    this.onChangeSexAtBirthId = this.onChangeSexAtBirthId.bind(this);
+    this.onChangeStateId = this.onChangeStateId.bind(this);
     this.onChangeBirthday = this.onChangeBirthday.bind(this);
-    this.onChangeState = this.onChangeState.bind(this);
     this.onChangeCity = this.onChangeCity.bind(this);
     this.onChangeZip = this.onChangeZip.bind(this);
 
@@ -167,18 +36,23 @@ export default class Register extends Component {
       username: "",
       email: "",
       password: "",
-      firstname:"",
-      lastname:"",
-      address:"",
-      // sex:"",
-      // gender:"",
-      birthday:"",
-      state:"",
-      city:"",
-      zip:"",
+      firstName: "",
+      lastName: "",
+      address: "",
+      sex_at_birth_id: "",
+      gender_id: "",
+      pronoun_id: "",
+      state_id: "",
+      birthday: "",
+      city: "",
+      zip: "",
       successful: false,
-      message: ""
-
+      message: "",
+      // dropdown options
+      genders: [],
+      pronouns: [],
+      sexAtBirths: [],
+      states: [],
     };
   }
 
@@ -202,13 +76,13 @@ export default class Register extends Component {
 
   onChangeFirstName(e){
     this.setState({
-      firstname: e.target.value
+      firstName: e.target.value
     });
   }
 
   onChangeLastName(e){
     this.setState({
-      lastname: e.target.value
+      lastName: e.target.value
     });
   }
 
@@ -218,27 +92,33 @@ export default class Register extends Component {
     });
   }
 
-  // onChangeSex(e){
-  //   this.setState({
-  //     sex: e.target.value
-  //   });
-  // }
+  onChangeGenderId(e){
+    this.setState({
+      gender_id: e.target.value
+    });
+  }
 
-  // onChangeGender(e){
-  //   this.setState({
-  //     gender: e.target.value
-  //   });
-  // }
+  onChangePronounId(e){
+    this.setState({
+      pronoun_id: e.target.value
+    });
+  }
+
+  onChangeSexAtBirthId(e){
+    this.setState({
+      sex_at_birth_id: e.target.value
+    });
+  }
+
+  onChangeStateId(e){
+    this.setState({
+      state_id: e.target.value
+    });
+  }
   
   onChangeBirthday(e){
     this.setState({
       birthday: e.target.value
-    });
-  }
-
-  onChangeState(e){
-    this.setState({
-      state: e.target.value
     });
   }
 
@@ -253,6 +133,49 @@ export default class Register extends Component {
       zip: e.target.value
     });
   }
+
+  componentDidMount() {
+    PersonService.getGenders().then(
+      response => {
+        this.setState({
+          genders: response.data.result
+        });
+      },
+      error => {
+        console.log(error);
+      }
+    );
+    PersonService.getPronouns().then(
+      response => {
+        this.setState({
+          pronouns: response.data.result
+        });
+      },
+      error => {
+        console.log(error);
+      }
+    );
+    PersonService.getSexAtBirths().then(
+      response => {console.log(response.data.result);
+        this.setState({
+          sexAtBirths: response.data.result
+        });
+      },
+      error => {
+        console.log(error);
+      }
+    );
+    PersonService.getStates().then(
+      response => {
+        this.setState({
+          states: response.data.result
+        });
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
   
   handleRegister(e) {
     e.preventDefault();
@@ -265,20 +188,21 @@ export default class Register extends Component {
     this.form.validateAll();
 
     if (this.checkBtn.context._errors.length === 0) {
-      AuthService.register(
-        this.state.username,
-        this.state.email,
-        this.state.password,
-        this.state.firstname,
-        this.state.lastname,
-        this.state.address,
-        this.state.birthday,
-        // this.state.sex,
-        // this.state.gender,
-        this.state.state,
-        this.state.city,
-        this.state.zip
-      ).then(
+      AuthService.register({
+        username: this.state.username,
+        email: this.state.email,
+        password: this.state.password,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        address: this.state.address,
+        birthday: this.state.birthday,
+        gender_id: this.state.gender_id,
+        pronoun_id: this.state.pronoun_id,
+        sex_at_birth_id: this.state.sex_at_birth_id,
+        state_id: this.state.state_id,
+        city: this.state.city,
+        zip: this.state.zip
+      }).then(
         response => {
           this.setState({
             message: response.data.message,
@@ -328,7 +252,7 @@ export default class Register extends Component {
                     name="username"
                     value={this.state.username}
                     onChange={this.onChangeUsername}
-                    validations={[required, vusername]}
+                    validations={[vrequired, vusername]}
                   />
                 </div>
 
@@ -340,7 +264,7 @@ export default class Register extends Component {
                     name="email"
                     value={this.state.email}
                     onChange={this.onChangeEmail}
-                    validations={[required, email]}
+                    validations={[vrequired, vemail]}
                   />
                 </div>
 
@@ -352,117 +276,143 @@ export default class Register extends Component {
                     name="password"
                     value={this.state.password}
                     onChange={this.onChangePassword}
-                    validations={[required, vpassword]}
+                    validations={[vrequired, vpassword]}
                   />
                 </div>
 
-                {/* add other information */}
                 <div className="form-group">
-                  <label htmlFor="firstname">FirstName</label>
+                  <label htmlFor="firstName">FirstName</label>
                   <Input
-                    type="firstname"
+                    type="text"
                     className="form-control"
-                    name="firstname"
-                    value={this.state.firstname}
+                    name="firstName"
+                    value={this.state.firstName}
                     onChange={this.onChangeFirstName}
-                    validations={[required, vfirstname]}
+                    validations={[vrequired, vfirstName]}
                   />
                 </div>
 
-
                 <div className="form-group">
-                  <label htmlFor="lastname">LastName</label>
+                  <label htmlFor="lastName">LastName</label>
                   <Input
-                    type="lastname"
+                    type="text"
                     className="form-control"
-                    name="lastname"
-                    value={this.state.lastname}
+                    name="lastName"
+                    value={this.state.lastName}
                     onChange={this.onChangeLastName}
-                    validations={[required, vlastname]}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="address">Address</label>
-                  <Input
-                    type="address"
-                    className="form-control"
-                    name="address"
-                    value={this.state.address}
-                    onChange={this.onChangeAddress}
-                    validations={[required, vaddress]}
+                    validations={[vrequired, vlastName]}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="birthday">Birthday</label>
                   <Input
-                    type="birthday"
+                    type="text"
                     className="form-control"
                     name="birthday"
                     value={this.state.birthday}
                     onChange={this.onChangeBirthday}
-                    validations={[required, date]}
-                  />
-                </div>
-
-                {/* <div className="form-group">
-                  <label htmlFor="sex">Sex</label>
-                  <Input
-                    type="sex"
-                    className="form-control"
-                    name="sex"
-                    value={this.state.sex}
-                    onChange={this.onChangeSex}
-                    validations={[required, vsex]}
+                    validations={[vrequired, vdate]}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="gender">Gender</label>
-                  <Input
-                    type="gender"
-                    className="form-control"
-                    name="gender"
-                    value={this.state.gender}
-                    onChange={this.onChangeGender}
-                    validations={[required, vgender]}
-                  />
-                </div> */}
+                  <label htmlFor="gender_id">Gender</label>
+                  <Select
+                    onChange={this.onChangeGenderId}
+                    validations={[vrequired]}
+                  >
+                    <option value="">Select One</option>
+                    {this.state.genders.length > 0 &&
+                      this.state.genders.map(item => (
+                        <option key={item.gender_id} value={item.gender_id}>
+                          {item.gender}
+                        </option>
+                      ))}
+                  </Select>
+                </div>
 
                 <div className="form-group">
-                  <label htmlFor="state">State</label>
+                  <label htmlFor="pronoun_id">Pronoun</label>
+                  <Select
+                    onChange={this.onChangePronounId}
+                    validations={[vrequired]}
+                  >
+                    <option value="">Select One</option>
+                    {this.state.pronouns.length > 0 &&
+                      this.state.pronouns.map(item => (
+                        <option key={item.pronoun_id} value={item.pronoun_id}>
+                          {item.pronoun}
+                        </option>
+                      ))}
+                  </Select>
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="sex_at_birth_id">Sex At Birth</label>
+                  <Select
+                    onChange={this.onChangeSexAtBirthId}
+                    validations={[vrequired]}
+                  >
+                    <option value="">Select One</option>
+                    {this.state.sexAtBirths.length > 0 &&
+                      this.state.sexAtBirths.map(item => (
+                        <option key={item.sex_at_birth_id} value={item.sex_at_birth_id}>
+                          {item.sex_at_birth}
+                        </option>
+                      ))}
+                  </Select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="address">Address</label>
                   <Input
-                    type="state"
+                    type="text"
                     className="form-control"
-                    name="state"
-                    value={this.state.state}
-                    onChange={this.onChangeState}
-                    validations={[required, vstate]}
+                    name="address"
+                    value={this.state.address}
+                    onChange={this.onChangeAddress}
+                    validations={[vrequired, vaddress]}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="city">City</label>
                   <Input
-                    type="city"
+                    type="text"
                     className="form-control"
                     name="city"
                     value={this.state.city}
                     onChange={this.onChangeCity}
-                    validations={[required, vcity]}
+                    validations={[vrequired, vcity]}
                   />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="state_id">State</label>
+                  <Select
+                    onChange={this.onChangeStateId}
+                    validations={[vrequired]}
+                  >
+                    <option value="">Select One</option>
+                    {this.state.states.length > 0 &&
+                      this.state.states.map(item => (
+                        <option key={item.state_id} value={item.state_id}>
+                          {item.state}
+                        </option>
+                      ))}
+                  </Select>
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="zip">Zip</label>
                   <Input
-                    type="zip"
+                    type="text"
                     className="form-control"
                     name="zip"
                     value={this.state.zip}
                     onChange={this.onChangeZip}
-                    validations={[required, vzip]}
+                    validations={[vrequired, vzip]}
                   />
                 </div>
 
