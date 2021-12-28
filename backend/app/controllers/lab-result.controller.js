@@ -53,8 +53,8 @@ exports.create = (req, res) => {
   
   // Retrieve all labResult from the database.
   exports.findAll = (req, res) => {
-    const lab_result_id = req.query.lab_result_id ;
-    var condition = lab_result_id ? { lab_result_id: { [Op.like]: `%${lab_result_id}%` } } : null;
+    const lab_id = req.query.lab_id ;
+    var condition = lab_id ? { lab_id: { [Op.like]: `%${lab_id}%` } } : null;
   
     LabResult.findAll({
       include: [{
@@ -155,7 +155,6 @@ exports.create = (req, res) => {
   };
 
 
-
   exports.getLabs = (req, res) => {
     // person has to have the role of doctor to be returned
     Lab.findAll().then(result  => {
@@ -180,9 +179,6 @@ exports.create = (req, res) => {
     });
   };
 
-
-
-  
 
   exports.getLabMeasurements = (req, res) => {
     // person has to have the role of doctor to be returned

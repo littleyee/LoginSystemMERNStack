@@ -45,22 +45,43 @@ exports.create = (req, res) => {
   };
   
   // Retrieve all Labs from the database.
+
   exports.findAll = (req, res) => {
-    const lab_id = req.query.lab_id ;
-    var condition = lab_id ? { lab_id: { [Op.like]: `%${lab_id}%` } } : null;
+    const patient_id = req.params.patient_id;
+    // var condition = lab_id ? { lab_id: { [Op.like]: `%${lab_id}%` } } : null;
+
+     console.log(`Test get' ${patient_id}`);
   
     Lab.findAll({
       include: [{
-       
         model: Person,
-        required: true
+        required: true,
+        as: 'patient'
+       },
+       {
+        model: Person,
+        required: true,
+        as: 'reviewer'
+       },
+       {
+        model: Person,
+        required: true,
+        as: 'orderer'
        }
       ],
-      where: condition 
+      where: {patient_id: { [Op.eq]: patient_id}} 
     })
-      .then(data => {
-        res.send(data);
-      })
+    .then(data => {
+      if (data.length === 0) {
+        res.status(404).send({
+          message: `No record for ${patient_id}!`
+        })
+        return
+      } 
+      console.log(data);
+
+      res.send(data);
+    })
       .catch(err => {
         res.status(500).send({
           message:
@@ -160,8 +181,6 @@ exports.create = (req, res) => {
       console.log("log", result)
     });
   };
-
-
 
   exports.getOrderedBys = (req, res) => {
     // person has to have the role of doctor to be returned

@@ -53,10 +53,10 @@ exports.create = (req, res) => {
       });
   };
   
-  // Retrieve all LabComments from the database.
+  // Retrieve all LabComments of one lab from the database.
   exports.findAll = (req, res) => {
-    const lab_comment_id = req.query.lab_comment_id ;
-    var condition = lab_comment_id ? { lab_comment_id: { [Op.like]: `%${lab_comment_id}%` } } : null;
+    const lab_id = req.query.lab_id ;
+    var condition = lab_id ? { lab_id: { [Op.like]: `%${lab_id}%` } } : null;
   
     LabComment.findAll({
       include: [{
@@ -175,17 +175,7 @@ exports.create = (req, res) => {
     });
   };
 
-  exports.getLabs = (req, res) => {
-    // person has to have the role of doctor to be returned
-    Lab.findAll().then(result  => {
-      if (!result ) {
-        return res.status(404).send({ message: "Options not found." });
-      }
-      res.status(200).send({
-        result
-      });
-    });
-  };
+  
 
   
 

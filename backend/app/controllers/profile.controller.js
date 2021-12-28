@@ -71,7 +71,6 @@ exports.profileEdit = (req, res) => {
           ],
         })
           .then(updatedPerson => {
-            console.log(updatedPerson);
             if (!updatedPerson) {
               return res.status(404).send({ message: "Person Not found." });
             }
