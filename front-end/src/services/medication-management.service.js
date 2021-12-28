@@ -16,7 +16,7 @@ class MedicationManagementDataService {
   }
 
   update(medication_id, data) {
-    return http.put(`/medication-management/${medication_id}`, data, { headers: authHeader() });
+    return http.put(`/medication-management/update/${medication_id}`, data, { headers: authHeader() });
   }
 
   delete(medication_id) {
@@ -24,7 +24,7 @@ class MedicationManagementDataService {
   }
 
   findByMedicationID(medication_id) {
-    return http.get(`/medication-management?medication_id=${medication_id}`, { headers: authHeader() });
+    return http.get(`/medication-management/getMedication/${medication_id}`, { headers: authHeader() });
   }
 
   findMedication(data) {

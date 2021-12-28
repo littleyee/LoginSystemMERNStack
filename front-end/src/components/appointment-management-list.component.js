@@ -1,23 +1,23 @@
 import React, { Component } from "react";
-import PersonManagementDataService from "../services/person-management.service";
+import AppointmentManagementDataService from "../services/appointment-management.service";
 import { Link } from "react-router-dom";
 
-export default class PersonManagementList extends Component {
+export default class AppointmentManagementList extends Component {
   constructor(props) {
     super(props);
     this.onChangeSearchFirstName = this.onChangeSearchFirstName.bind(this);
     this.onChangeSearchLastName = this.onChangeSearchLastName.bind(this);
     this.onChangeSearchBirthday = this.onChangeSearchBirthday.bind(this);
 
-    this.deletePersonManagement = this.deletePersonManagement.bind(this);
-    this.retrievePersonManagement = this.retrievePersonManagement.bind(this);
+    this.cancelAppointmentManagement = this.cancelAppointmentManagement.bind(this);
+    this.retrieveAppointmentManagement = this.retrieveAppointmentManagement.bind(this);
     this.refreshList = this.refreshList.bind(this);
-    this.setActivePersonManagement = this.setActivePersonManagement.bind(this);
-    this.searchPerson = this.searchPerson.bind(this);
+    this.setActiveAppointmentManagement = this.setActiveAppointmentManagement.bind(this);
+    this.searchAppointment = this.searchAppointment.bind(this);
 
     this.state = {
-      personManagement: [],
-      currentPersonManagement: null,
+      appointmentManagement: [],
+      currentAppointmentManagement: null,
       currentIndex: -1,
       searchParams: {
         firstName: "",
@@ -28,13 +28,13 @@ export default class PersonManagementList extends Component {
   }
 
   componentDidMount() {
-    this.retrievePersonManagement();
+    this.retrieveAppointmentManagement();
   }
 
-  deletePersonManagement() {    
-    PersonManagementDataService.delete(this.state.currentPersonManagement.person_id)
+  cancelAppointmentManagement() {    
+    AppointmentManagementDataService.cancel(this.state.currentAppointmentManagement.appointment_id)
       .then(() => {
-        //this.props.history.push('/person-management')
+        //this.props.history.push('/appointment-management')
         window.location.reload();
       })
       .catch(e => {
@@ -66,11 +66,25 @@ export default class PersonManagementList extends Component {
     console.log(this.state);
   }
 
-  retrievePersonManagement() {
-    PersonManagementDataService.getAll()
+  retrieveAppointmentManagement() {
+    AppointmentManagementDataService.getAll()
       .then(response => {
+        // simplify doctor
+        for (let appointment_index in response.data) {
+          var temp_date = new Date(response.data[appointment_index].appointment_date);
+          response.data[appointment_index].appointment_date = 
+            temp_date.getFullYear() + "-" + 
+            ('0' + temp_date.getDate()).slice(-2)  + "-" + 
+            ('0' + (temp_date.getMonth()+1)).slice(-2) + " " + 
+            ('0' + temp_date.getHours()).slice(-2) + ":" + 
+            ('0' + temp_date.getMinutes()).slice(-2);
+          for (let appointment_team_index in response.data[appointment_index].appointment_teams) {
+            if(response.data[appointment_index].appointment_teams[appointment_team_index].appointment_team_role_id == 1)
+              response.data[appointment_index].doctor = response.data[appointment_index].appointment_teams[appointment_team_index];
+          }
+        }
         this.setState({
-          personManagement: response.data
+          appointmentManagement: response.data
         });
         console.log(response.data);
       })
@@ -80,30 +94,30 @@ export default class PersonManagementList extends Component {
   }
 
   refreshList() {
-    this.retrievePersonManagement();
+    this.retrieveAppointmentManagement();
     this.setState({
-      currentPersonManagement: null,
+      currentAppointmentManagement: null,
       currentIndex: -1
     });
   }
 
-  setActivePersonManagement(personManagement, index) {console.log(personManagement);
+  setActiveAppointmentManagement(appointmentManagement, index) {
     this.setState({
-      currentPersonManagement: personManagement,
+      currentAppointmentManagement: appointmentManagement,
       currentIndex: index
     });
   }
 
-  searchPerson() {
+  searchAppointment() {
     this.setState({
-      currentPersonManagement: null,
+      currentAppointmentManagement: null,
       currentIndex: -1
     });
 
-    PersonManagementDataService.findPerson(this.state.searchParams)
+    AppointmentManagementDataService.findAppointment(this.state.searchParams)
       .then(response => {
         this.setState({
-          personManagement: response.data
+          appointmentManagement: response.data
         });
       })
       .catch(e => {
@@ -112,7 +126,7 @@ export default class PersonManagementList extends Component {
   }
 
   render() {
-    const { personManagement, currentPersonManagement, currentIndex } = this.state;
+    const { appointmentManagement, currentAppointmentManagement, currentIndex } = this.state;
 
     return (
       <div className="list row">
@@ -143,7 +157,7 @@ export default class PersonManagementList extends Component {
               <button
                 className="btn btn-outline-secondary"
                 type="button"
-                onClick={this.searchPerson}
+                onClick={this.searchAppointment}
               >
                 Search
               </button>
@@ -151,114 +165,81 @@ export default class PersonManagementList extends Component {
           </div>
         </div>
         <div className="col-md-6">
-          <h4>Person Management List</h4>
+          <h4>Appointment Management List</h4>
 
           <table className="table table-striped">
             <thead>
               <tr>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Birthday</th>
+                <th scope="col">Appointment Status</th>
+                <th scope="col">Appointment Date</th>
+                <th scope="col">Patient</th>
+                <th scope="col">Doctor</th>
               </tr>
             </thead>
             <tbody>
-              {personManagement &&
-                personManagement.map((personManagement, index) => (
+              {appointmentManagement &&
+                appointmentManagement.map((appointments, index) => (
                   <tr 
                     role="row" 
-                    key={personManagement.person_id}
-                    onClick={() => this.setActivePersonManagement(personManagement, index)}
+                    key={appointments.appointment_id}
+                    onClick={() => this.setActiveAppointmentManagement(appointments, index)}
                   >
-                    <td>{personManagement.firstName}</td>
-                    <td>{personManagement.lastName}</td>
-                    <td>{personManagement.birthday}</td>
+                  <td>{appointments.appointment_status.appointment_status}</td>
+                  <td>{appointments.appointment_date}</td>
+                  <td>{appointments.patient.firstName} {appointments.patient.lastName}</td>
+                  <td>{appointments.doctor.employee.firstName} {appointments.doctor.employee.lastName}</td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </div>
         <div className="col-md-6">
-          {currentPersonManagement ? ( 
+          {currentAppointmentManagement ? ( 
             <div>
-              <h4>Person Info</h4>
-              <div>
-                <label>
-                  <strong>Name:</strong>
-                </label>{" "}
-                {currentPersonManagement.firstName} {currentPersonManagement.lastName}
-              </div>
-              <div>
-                <label>
-                  <strong>Email:</strong>
-                </label>{" "}
-                {currentPersonManagement.email}
-              </div>
-              <div>
-                <label>
-                  <strong>Birthday:</strong>
-                </label>{" "}
-                {currentPersonManagement.birthday}
-              </div>
-              <div>
-                <label>
-                  <strong>Gender:</strong>
-                </label>{" "}
-                {currentPersonManagement.gender.gender}
-              </div>
-              <div>
-                <label>
-                  <strong>Pronouns:</strong>
-                </label>{" "}
-                {currentPersonManagement.pronoun.pronoun}
-              </div>
-              <div>
-                <label>
-                  <strong>Sex at Birth:</strong>
-                </label>{" "}
-                {currentPersonManagement.sex_at_birth.sex_at_birth}
-              </div>
-              <div>
-                <label>
-                  <strong>Address:</strong>
-                </label>{" "}
-                {currentPersonManagement.address}
-              </div>
-              <div>
-                <label>
-                  <strong>City:</strong>
-                </label>{" "}
-                {currentPersonManagement.city}
-              </div>
+              <h4>Appointment Info</h4>
               <div>
                 <label>
                   <strong>State:</strong>
                 </label>{" "}
-                {currentPersonManagement.state.state}
+                {currentAppointmentManagement.appointment_status.appointment_status}
               </div>
               <div>
                 <label>
-                  <strong>Zip:</strong>
+                  <strong>Patient Name:</strong>
                 </label>{" "}
-                {currentPersonManagement.zip}
+                {currentAppointmentManagement.patient.firstName} {currentAppointmentManagement.patient.lastName}
               </div>
-
+              <div>
+                <label>
+                  <strong>Doctor:</strong>
+                </label>{" "}
+                {currentAppointmentManagement.doctor.employee.firstName} {currentAppointmentManagement.doctor.employee.lastName}
+              </div>
+              <div>
+                <label>
+                  <strong>Appointment Date:</strong>
+                </label>{" "}
+                {currentAppointmentManagement.appointment_date}
+              </div>
+              
               <Link
-                to={"/person-management/" + currentPersonManagement.person_id}
+                to={"/appointment-management/" + currentAppointmentManagement.appointment_id}
                 className="btn btn-primary btn-block"
               >
                 Edit
               </Link>
               <button
                 className="btn btn-danger btn-block"
-                onClick={this.deletePersonManagement}
+                onClick={this.cancelAppointmentManagement}
               >
-                Delete
+                Cancel
               </button>
+
             </div>
           ) : (
             <div>
               <br />
-              <p>Please click on a User...</p>
+              <p>Please click on an appointment...</p>
             </div>
           )}
         </div>

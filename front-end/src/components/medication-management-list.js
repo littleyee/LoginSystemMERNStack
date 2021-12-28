@@ -95,9 +95,9 @@ export default class MedicationManagementList extends Component {
     });
   }
 
-  setActiveMedicationManagement(medicationManagement, index) {console.log(medicationManagement);
+  setActiveMedicationManagement(thisMedication, index) {
     this.setState({
-      currentMedicationManagement: medicationManagement,
+      currentMedicationManagement: thisMedication,
       currentIndex: index
     });
   }
@@ -144,21 +144,21 @@ export default class MedicationManagementList extends Component {
             <thead>
               <tr>
                 <th scope="col">Medication</th>
-                <th scope="col">Measurement</th>
+                <th scope="col">Amount</th>
                 <th scope="col">Frequency</th>
               </tr>
             </thead>
             <tbody>
               {medicationManagement &&
-                medicationManagement.map((medicationManagement, index) => (
+                medicationManagement.map((thisMedication, index) => (
                   <tr 
                     role="row" 
-                    key={medicationManagement.medication_id}
-                    onClick={() => this.setActiveMedicationManagement(medicationManagement, index)}
+                    key={thisMedication.medication_id}
+                    onClick={() => this.setActiveMedicationManagement(thisMedication, index)}
                   > 
-                    <td>{medicationManagement.medication}</td>
-                    <td>{medicationManagement.measurement}</td>
-                    <td>{medicationManagement.frequency}</td>
+                    <td>{thisMedication.medication.medication}</td>
+                    <td>{thisMedication.amount} {thisMedication.medication_measurement.medication_measurement}</td>
+                    <td>{thisMedication.medication_frequency.medication_frequency}</td>
 
                   </tr>
                 ))}
@@ -175,28 +175,28 @@ export default class MedicationManagementList extends Component {
                 <label>
                   <strong>Medication:</strong>
                 </label>{" "}
-                {currentMedicationManagement.medication} 
+                {currentMedicationManagement.medication.medication} 
               </div>
 
               <div>
                 <label>
                   <strong>Medication Measurement:</strong>
                 </label>{" "}
-                {currentMedicationManagement.medicationMeasurement}
+                {currentMedicationManagement.medication_measurement.medication_measurement}
               </div>
 
               <div>
                 <label>
                   <strong>Medication Frequency:</strong>
                 </label>{" "}
-                {currentMedicationManagement.medicationFrequency}
+                {currentMedicationManagement.medication_frequency.medication_frequency}
               </div>
 
               <div>
                 <label>
-                  <strong>Prescribe by:</strong>
+                  <strong>Prescribed by:</strong>
                 </label>{" "}
-                {currentMedicationManagement.prescribed_by}
+                {currentMedicationManagement.prescribed_by.firstName} {currentMedicationManagement.prescribed_by.lastName}
               </div>
 
               <div>
@@ -210,13 +210,13 @@ export default class MedicationManagementList extends Component {
                 <label>
                   <strong>Pharmacy:</strong>
                 </label>{" "}
-                {currentMedicationManagement.pharmacy}
+                {currentMedicationManagement.pharmacy.name}
               </div>
 
 
               
               <Link
-                to={"/medication-management/" + currentMedicationManagement.medication_id}
+                to={"/person-management/" + currentMedicationManagement.patient_id +"/medications/" +currentMedicationManagement.medication_id}
                 className="btn btn-primary btn-block"
               >
                 Edit Medication

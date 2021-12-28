@@ -87,7 +87,7 @@ export default class PersonManagementList extends Component {
     });
   }
 
-  setActivePersonManagement(personManagement, index) {console.log(personManagement);
+  setActivePersonManagement(personManagement, index) {
     this.setState({
       currentPersonManagement: personManagement,
       currentIndex: index
@@ -241,7 +241,19 @@ export default class PersonManagementList extends Component {
                 </label>{" "}
                 {currentPersonManagement.zip}
               </div>
-
+              <Link
+                to={"/person-management/" + currentPersonManagement.person_id + "/labs"}
+                className="btn btn-primary btn-block"
+              >
+                Lab
+              </Link>
+              
+              <Link
+                to={"/person-management/" + currentPersonManagement.person_id + "/medications"}
+                className="btn btn-primary btn-block"
+              >
+                Medication Record
+              </Link>
               <Link
                 to={"/person-management/" + currentPersonManagement.person_id}
                 className="btn btn-primary btn-block"
@@ -254,6 +266,7 @@ export default class PersonManagementList extends Component {
               >
                 Delete
               </button>
+
             </div>
           ) : (
             <div>

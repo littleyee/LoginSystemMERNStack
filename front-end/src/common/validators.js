@@ -24,7 +24,16 @@ export const vdate = value => {
   if (!isDate(value)) {
       return (
           <div className="alert alert-danger" role="alert">
-              This is not a valid date.
+              This is not a valid date. (yyy-mm-dd)
+          </div>
+      );
+  }
+};
+export const vtimestamp = value => {
+  if (value.length != 19 || isNaN(Date.parse(value, "yyyy/MM/dd HH:mm:ss"))) {
+      return (
+          <div className="alert alert-danger" role="alert">
+              This is not a valid timestamp.  (yyyy-mm-dd hh:mm:ss)
           </div>
       );
   }

@@ -9,10 +9,6 @@ class UserService {
     return http.get('user/user', { headers: authHeader() });
   }
 
-  getModeratorBoard() {
-    return http.get('user/mod', { headers: authHeader() });
-  }
-
   getAdminBoard() {
     return http.get('user/admin', { headers: authHeader() });
   }

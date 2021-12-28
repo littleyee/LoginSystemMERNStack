@@ -239,7 +239,7 @@ export default class PersonManagementCreate extends Component {
       }
     );
     PersonService.getSexAtBirths().then(
-      response => {console.log(response.data.result);
+      response => {
         this.setState({
           sexAtBirths: response.data.result
         });

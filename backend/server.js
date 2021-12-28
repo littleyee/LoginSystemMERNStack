@@ -23,10 +23,10 @@ const { pharmacy, lab } = require("./app/models");
 
 db.sequelize.sync();
 // force: true will drop the table if it already exists
-//db.sequelize.sync({force: true}).then(() => {
-//  console.log('Drop and Resync Database with { force: true }');//
-//  initial();
-//});
+/* db.sequelize.sync({force: true}).then(() => {
+  console.log('Drop and Resync Database with { force: true }');
+  initial();
+}); */
 
 // simple route
 app.get("/", (req, res) => {
@@ -46,6 +46,15 @@ require('./app/routes/lab-comment.routes')(app);
 require('./app/routes/lab-result.routes')(app);
 
 
+require('./app/routes/bill-management.routes')(app);
+require('./app/routes/insurance-management.routes')(app);
+require('./app/routes/msg-management.routes')(app);
+
+require('./app/routes/appointment.routes')(app);
+require('./app/routes/appointment-request.routes')(app);
+require('./app/routes/appointment-request-management.routes')(app);
+require('./app/routes/appointment-management.routes')(app);
+
 // set port, listen for requests
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
@@ -54,6 +63,7 @@ app.listen(PORT, () => {
 
 // this can all be deleted once we remove the complete resync
 const Role = db.role;
+
 const Gender = db.gender;
 const Pronoun = db.pronoun;
 const SexAtBirth = db.sexAtBirth;
@@ -67,6 +77,10 @@ const Lab = db.lab
 const LabResult = db.labResult
 const LabComment = db.labComment
 
+
+const AppointmentRequestTime = db.appointmentRequestTime;
+const AppointmentStatus = db.appointmentStatus;
+const AppointmentTeamRole = db.appointmentTeamRole;
 
 function initial() {
   // Genders
@@ -160,6 +174,22 @@ function initial() {
   
   
     
+
+  // appointment request times
+  AppointmentRequestTime.create({time: "Mornings"});
+  AppointmentRequestTime.create({time: "Afternoons"});
+  AppointmentRequestTime.create({time: "Evenings"});
+
+  // appointment statuses
+  AppointmentStatus.create({appointment_status_id: 1, appointment_status: "Cancelled"});
+  AppointmentStatus.create({appointment_status_id: 2, appointment_status: "Upcoming"});
+  AppointmentStatus.create({appointment_status_id: 3, appointment_status: "Checked Out"});
+  AppointmentStatus.create({appointment_status_id: 4, appointment_status: "Checked In"});
+
+  // appointment team roles
+  AppointmentTeamRole.create({appointment_team_role: "Primary Doctor"});
+  AppointmentTeamRole.create({appointment_team_role: "Secondary Doctor"});
+  AppointmentTeamRole.create({appointment_team_role: "Nurse"});
 
   // roles
   Role.create({name: "patient"});

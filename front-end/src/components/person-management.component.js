@@ -195,7 +195,6 @@ export default class PersonManagement extends Component {
         this.setState({
           currentPersonManagement: response.data
         });
-        console.log(response.data);
       })
       .catch(e => {
         console.log(e);
@@ -279,7 +278,7 @@ export default class PersonManagement extends Component {
       }
     );
     PersonService.getSexAtBirths().then(
-      response => {console.log(response.data.result);
+      response => {
         this.setState({
           sexAtBirths: response.data.result
         });

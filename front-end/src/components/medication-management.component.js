@@ -12,12 +12,11 @@ import MedicationManagementDataService from "../services/medication-management.s
 export default class MedicationManagement extends Component {
   constructor(props) {
     super(props);
-    this.onChangePatientId = this.onChangePatientId.bind(this);
     this.onChangeAmount = this.onChangeAmount.bind(this);
     this.onChangeMedicationFrequencyId = this.onChangeMedicationFrequencyId.bind(this);
-    this.onChangeMedicationMeasurementId = this.onChangeMedicationMeasurementId .bind(this);
+    this.onChangeMedicationMeasurementId = this.onChangeMedicationMeasurementId.bind(this);
     this.onChangePrescribedBy = this.onChangePrescribedBy.bind(this);
-    this.onChangePrescribedOn= this.onChangePrescribedOn.bind(this);
+    this.onChangePrescribedOn = this.onChangePrescribedOn.bind(this);
     this.onChangePharmacyId = this.onChangePharmacyId.bind(this);
 
     this.getMedicationManagement = this.getMedicationManagement.bind(this);
@@ -27,8 +26,8 @@ export default class MedicationManagement extends Component {
 
       currentMedicationManagement: {
         patient_id: "",
-
         medication_id: "",
+
         amount: "",
         medication_frequency_id: "",
         medication_measurement_id: "",
@@ -36,28 +35,27 @@ export default class MedicationManagement extends Component {
         prescribed_on: "",
         pharmacy_id: ""
       },
-      message: "",
-      submitted: false,
-  
-      // dropdown options
+       
       medications: [],
       medicationFrequencies: [],
       medicationMeasurements: [],
-      doctors: [],    
+      doctors: [],
       pharmacies: [],
+
+      message: "",
+      submitted: false,
         
     };
      
   }
-
-  onChangeMedicationID(e) {
-    const medication_id = e.target.value;
-
+  
+  onChangeAmount(e) {
+    const amount = e.target.value;
     this.setState(function(prevState) {
       return {
         currentMedicationManagement: {
           ...prevState.currentMedicationManagement,
-          medication_id: medication_id
+          amount:amount
         }
       };
     });
@@ -87,14 +85,47 @@ export default class MedicationManagement extends Component {
     });
   }
 
+  onChangePrescribedBy(e) {
+    const prescribed_by = e.target.value;
+    this.setState(function(prevState) {
+      return {
+        currentMedicationManagement: {
+          ...prevState.currentMedicationManagement,
+          prescribed_by:prescribed_by
+        }
+      };
+    });
+  }
 
+  onChangePrescribedOn(e) {
+    const prescribed_on = e.target.value;
+    this.setState(function(prevState) {
+      return {
+        currentMedicationManagement: {
+          ...prevState.currentMedicationManagement,
+          prescribed_on:prescribed_on
+        }
+      };
+    });
+  }
+
+  onChangePharmacyId(e) {
+    const pharmacy_id = e.target.value;
+    this.setState(function(prevState) {
+      return {
+        currentMedicationManagement: {
+          ...prevState.currentMedicationManagement,
+          pharmacy_id:pharmacy_id
+        }
+      };
+    });
+  }
   getMedicationManagement(medication_id) {
-    MedicationManagementDataService.get(medication_id)
+    MedicationManagementDataService.findByMedicationID(medication_id)
       .then(response => {
         this.setState({
           currentMedicationManagement: response.data
         });
-        console.log(response.data);
       })
       .catch(e => {
         console.log(e);
@@ -117,7 +148,7 @@ export default class MedicationManagement extends Component {
         this.state.currentMedicationManagement
       ).then(
         response => {
-          this.props.history.push('/medication-management')
+          this.props.history.push('/person-management/'+this.state.currentMedicationManagement.patient_id+'/medications')
           window.location.reload();
         },
         error => {
@@ -144,7 +175,6 @@ export default class MedicationManagement extends Component {
 
     
     // get drop down information
-    
     MedicationManagementDataService.getMedications().then(
       response => {
         this.setState({
@@ -204,7 +234,6 @@ export default class MedicationManagement extends Component {
          this.setState({
            doctors: response.data.result
          });
-         console.log(this.state);
        },
        error => {
          this.setState({
@@ -239,7 +268,6 @@ export default class MedicationManagement extends Component {
 
   render() {
     const { currentMedicationManagement } = this.state;
-
     return (
       <div>
         {currentMedicationManagement ? (
@@ -255,7 +283,7 @@ export default class MedicationManagement extends Component {
                 <div className="form-group">
                   <label htmlFor="medication_id">Medication</label>
                   <Select
-                    value={this.state.medication_id}
+                    value={currentMedicationManagement.medication_id}
                     onChange={this.onChangeMedicationId}
                     validations={[vrequired]}
                   >
@@ -263,7 +291,7 @@ export default class MedicationManagement extends Component {
                     {this.state.medications.length > 0 &&
                       this.state.medications.map(item => (
                         <option key={item.medication_id} value={item.medication_id}>
-                          {item.medications}
+                          {item.medication}
                         </option>
                       ))}
                   </Select>
@@ -275,7 +303,7 @@ export default class MedicationManagement extends Component {
                     type="text"
                     className="form-control"
                     name="amount"
-                    value={this.state.amount}
+                    value={currentMedicationManagement.amount}
                     onChange={this.onChangeAmount}
                     validations={[vrequired]}
                   />
@@ -285,7 +313,7 @@ export default class MedicationManagement extends Component {
                 <div className="form-group">
                   <label htmlFor="medication_frequency_id">Medication Frequency</label>
                   <Select
-                    value={this.state.medication_frequency_id}
+                    value={currentMedicationManagement.medication_frequency_id}
                     onChange={this.onChangeMedicationFrequencyId}
                     validations={[vrequired]}
                   >
@@ -293,7 +321,7 @@ export default class MedicationManagement extends Component {
                     {this.state.medicationFrequencies.length > 0 &&
                       this.state.medicationFrequencies.map(item => (
                         <option key={item.medication_frequency_id} value={item.medication_frequency_id}>
-                          {item.medicationFrequencies}
+                          {item.medication_frequency}
                         </option>
                       ))}
                   </Select>
@@ -302,7 +330,7 @@ export default class MedicationManagement extends Component {
                  <div className="form-group">
                   <label htmlFor="medication_measurement_id">Medication Measurement</label>
                   <Select
-                    value={this.state.medication_measurement_id}
+                    value={currentMedicationManagement.medication_measurement_id}
                     onChange={this.onChangeMedicationMeasurementId}
                     validations={[vrequired]}
                   >
@@ -310,7 +338,7 @@ export default class MedicationManagement extends Component {
                     {this.state.medicationMeasurements.length > 0 &&
                       this.state.medicationMeasurements.map(item => (
                         <option key={item.medication_measurement_id} value={item.medication_measurement_id}>
-                          {item.medicationMeasurements}
+                          {item.medication_measurement}
                         </option>
                       ))}
                   </Select>
@@ -343,7 +371,7 @@ export default class MedicationManagement extends Component {
                <div className="form-group">
                   <label htmlFor="prescribed_by">Prescribed By</label>
                   <Select
-                    value={this.state.prescribed_by}
+                    value={currentMedicationManagement.prescribed_by}
                     onChange={this.onChangePrescribedBy}
                     validations={[vrequired]}
                   >
@@ -363,7 +391,7 @@ export default class MedicationManagement extends Component {
                     type="text"
                     className="form-control"
                     name="prescribed_on"
-                    value={this.state.prescribed_on}
+                    value={currentMedicationManagement.prescribed_on}
                     onChange={this.onChangePrescribedOn}
                     validations={[vrequired, vdate]}
                   />
@@ -373,7 +401,7 @@ export default class MedicationManagement extends Component {
                  <div className="form-group">
                   <label htmlFor="pharmacy_id">Pharmacy</label>
                   <Select
-                    value={this.state.pharmacy_id}
+                    value={currentMedicationManagement.pharmacy_id}
                     onChange={this.onChangePharmacyId}
                     validations={[vrequired]}
                   >
@@ -381,7 +409,7 @@ export default class MedicationManagement extends Component {
                     {this.state.pharmacies.length > 0 &&
                       this.state.pharmacies.map(item => (
                         <option key={item.pharmacy_id} value={item.pharmacy_id}>
-                          {item.pharmacies}
+                          {item.name}
                         </option>
                       ))}
                   </Select>

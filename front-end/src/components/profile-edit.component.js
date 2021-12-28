@@ -144,7 +144,7 @@ export default class ProfileEdit extends Component {
       }
     );
     PersonService.getSexAtBirths().then(
-      response => {console.log(response.data.result);
+      response => {
         this.setState({
           sexAtBirths: response.data.result
         });
