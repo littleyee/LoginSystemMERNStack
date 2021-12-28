@@ -10,38 +10,39 @@ module.exports = app => {
       );
       next();
     });
+
+
+     // Create a new lab result 
+  router.post("/create", 
+  [authJwt.verifyToken, authJwt.isAdmin],
+  labComment.create);
+
+   // select options
+   router.get("/getNurses", 
+   labComment.getNurses
+);
+
   
   
     // Retrieve a single lab_comment with lab_comment_id
-    router.get("/:lab_comment_id", 
+    router.get("getComment/:lab_comment_id", 
       [authJwt.verifyToken, authJwt.isAdmin],
       labComment.findOne
     );
   
     // Update a lab_comment_id with lab_comment_id
     router.put("/:lab_comment_id", 
-      [authJwt.verifyToken, authJwt.isAdmin, verifySignUp.checkDuplicateEmail],
+      [authJwt.verifyToken, authJwt.isAdmin],
       labComment.update
     );
+
+    // get all lab results for one lab 
+  router.get("/:lab_id", 
+  [authJwt.verifyToken, authJwt.isAdmin],
+  labComment.findAll);
   
-    // Delete a lab comment with lab_comment_id
-    router.delete("/:lab_comment_id", 
-      [authJwt.verifyToken, authJwt.isAdmin],
-      labComment.delete
-    );
-    
-    
-
-      // select options
-      router.get("/:lab_comment_id/getNurses", 
-      labComment.getNurses
-  );
-
-  // select options
-      router.get("/:lab_comment_id/getLabs", 
-      labComment.getLabs
-  );
-
     // define the prefix to the route
-    app.use('/api/lab-comment', router);
+    app.use('/api/lab-management/lab-comment', router);
   };
+
+  

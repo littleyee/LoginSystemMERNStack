@@ -10,39 +10,49 @@ module.exports = app => {
       );
       next();
     });
+
+    // Create a new lab
+  router.post("/create", 
+  [authJwt.verifyToken, authJwt.isAdmin],
+  labManagement.create);
   
+
+// select options
+  router.get("/getOrderedBys", 
+  labManagement.getOrderedBys);
+
+  router.get("/getPatients", 
+  labManagement.getPatients
+  );
+
+  router.get("/getReviewedBys", 
+  labManagement.getReviewedBys
+  );
+
+    // Retrieve a single lab
+  router.get("/:lab_id/getLab", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    labManagement.findOne
+  );
   
-    // Retrieve a single patient medication with patient_medication_id
-    router.get("/:lab_id", 
-      [authJwt.verifyToken, authJwt.isAdmin],
-      labManagement.findOne
-    );
-  
-    // Update a patient_medication_id with patient_medication_id
-    router.put("/:lab_id", 
-      [authJwt.verifyToken, authJwt.isAdmin, verifySignUp.checkDuplicateEmail],
-      labManagement.update
-    );
-  
-    // Delete a Person with person_id
-    router.delete("/:lab_id", 
-      [authJwt.verifyToken, authJwt.isAdmin],
-      labManagement.delete
-    );
-    
-    // select options
-    router.get("/:lab_id/getOrderedBys", 
-        labManagement.getOrderedBys
-    );
-  
-    router.get("/:lab_id/getPatients", 
-        labManagement.getPatients
-    );
-  
-    router.get("/:lab_id/getReviewedBys", 
-        labManagement.getReviewedBys
-    );
+    // Update a lab
+  router.put("/:lab_id/update", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    labManagement.update
+  );
+
+  // get all labs
+  router.get("/:patient_id", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    labManagement.findAll
+  );
+
+  // Delete a Person with person_id
+  router.delete("/:lab_id/delete", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    labManagement.delete
+  );
   
     // define the prefix to the route
-    app.use('/api/labs', router);
+    app.use('/api/lab-management', router);
   };

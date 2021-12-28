@@ -16,6 +16,7 @@ module.exports = app => {
     [authJwt.verifyToken, authJwt.isAdmin],
     medicationManagement.create
   );
+
 /*
   // Retrieve all Person
   router.get("/", 
@@ -29,11 +30,7 @@ module.exports = app => {
     medicationManagement.findOne
   );
 
-  // Update a patient_medication_id with patient_medication_id
-  router.put("/:patient_medication_id", 
-    [authJwt.verifyToken, authJwt.isAdmin, verifySignUp.checkDuplicateEmail],
-    medicationManagement.update
-  );
+  
 
   // Delete a Person with person_id
   router.delete("/:patient_medication_id", 
@@ -62,11 +59,24 @@ module.exports = app => {
     medicationManagement.getPharmacies
   );
 
+  // Retrieve a single patient medication with patient_medication_id
+  router.get("/getMedication/:patient_medication_id", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    medicationManagement.findOne
+  );
+  
+  // Update a patient_medication_id with patient_medication_id
+  router.put("/update/:patient_medication_id", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    medicationManagement.update
+  );
+  
   // get all medications
   router.get("/:patient_id", 
-    [authJwt.verifyToken, authJwt.isAdmin],
-    medicationManagement.getAll
-  );
+   [authJwt.verifyToken, authJwt.isAdmin],
+   medicationManagement.getAll
+ );
+ 
 
   // define the prefix to the route
   app.use('/api/medication-management', router);

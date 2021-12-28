@@ -2,6 +2,8 @@ module.exports = app => {
   const { authJwt, verifySignUp } = require("../middleware");
   const personManagement = require("../controllers/person-management.controller.js");
   const medicationManagement = require("../controllers/medication-management.controller.js");
+
+  const labManagement = require("../controllers/lab-management.controller.js");
   const router = require("express").Router();
 
   router.use(function (req, res, next) {
@@ -14,37 +16,37 @@ module.exports = app => {
 
   // Create a new Person
   router.post("/", 
-    [authJwt.verifyToken, authJwt.isAdmin, verifySignUp.checkDuplicateEmail],
+    [authJwt.verifyToken, authJwt.hasRole(['admin']), verifySignUp.checkDuplicateEmail],
     personManagement.create
   );
 
   // Retrieve all Person
   router.get("/", 
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken, authJwt.hasRole(['admin'])],
     personManagement.findAll
   );
 
   // Retrieve all Person
   router.post("/search", 
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken, authJwt.hasRole(['admin'])],
     personManagement.findPerson
   );
 
   // Retrieve a single Person with person_id
   router.get("/:person_id", 
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken, authJwt.hasRole(['admin'])],
     personManagement.findOne
   );
 
   // Update a Person with person_id
   router.put("/:person_id", 
-    [authJwt.verifyToken, authJwt.isAdmin, verifySignUp.checkDuplicateEmail],
+    [authJwt.verifyToken, authJwt.hasRole(['admin']), verifySignUp.checkDuplicateEmail],
     personManagement.update
   );
 
   // Delete a Person with person_id
   router.delete("/:person_id", 
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken, authJwt.hasRole(['admin'])],
     personManagement.delete
   );
 
@@ -55,9 +57,9 @@ module.exports = app => {
   );
 
   // get a Person lab records with person_id
-  router.get("/:person_id/medications", 
+  router.get("/:person_id/labs", 
   [authJwt.verifyToken, authJwt.isAdmin],
-  medicationManagement.getAll
+  labManagement.findAll
 );
 
 

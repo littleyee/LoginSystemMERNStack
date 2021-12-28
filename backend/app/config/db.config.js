@@ -4,6 +4,7 @@ module.exports = {
   PASSWORD: "raman",
   DB: "healthcare",
   dialect: "mysql",
+  timezone: 'America/Chicago',
   pool: {
     max: 5,
     min: 0,
